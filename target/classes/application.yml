@@ -1,0 +1,39 @@
+variable.security.jwt:
+  tokenIssuer: sanghuynh
+  tokenSigningKey: shape-challenge
+  #  Token is valid for 1 day = 1440 mins
+  tokenExpirationTime: 1440
+  #  Token is valid for 1 week = 10080 mins
+  tokenExpirationTimeWithRememberMe: 10080
+
+spring:
+  application:
+    name: ShapeChallenge
+  datasource:
+    url: jdbc:mysql://localhost:3306/shape-challenge?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: 123123
+    driverClassName: com.mysql.jdbc.Driver
+  profiles:
+    # The commented value for `active` can be replaced with valid Spring profiles to load.
+    # Otherwise, it will be filled in by maven when building the WAR file
+    # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
+    active: #spring.profiles.active#
+  jackson:
+    serialization.write_dates_as_timestamps: false
+  jpa:
+    hibernate.ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    database: MYSQL
+    show-sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+
+server:
+  port: 8088
+
+
+

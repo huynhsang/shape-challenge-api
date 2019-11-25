@@ -1,0 +1,16 @@
+version: "3"
+services:
+    shapedb:
+        image: mysql:5.7
+        container_name: shape_mysql
+        ports:
+            - "3306:3306"
+        restart: always
+        volumes:
+            - ./dbStructure.sql:/docker-entrypoint-initdb.d/dbStructure.sql
+        environment:
+            MYSQL_ROOT_PASSWORD: 123123
+            MYSQL_DATABASE: shape-challenge
+            MYSQL_CHARSET: utf8
+            MYSQL_COLLATION: utf8_general_ci
+        command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8
