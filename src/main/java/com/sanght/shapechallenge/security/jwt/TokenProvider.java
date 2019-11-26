@@ -1,10 +1,10 @@
 package com.sanght.shapechallenge.security.jwt;
 
+import com.sanght.shapechallenge.common.constant.JWTAccountConstant;
 import io.jsonwebtoken.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,29 +23,27 @@ public class TokenProvider implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private final Logger log = LoggerFactory.getLogger(TokenProvider.class);
 	private static final String AUTHORITIES_KEY = "auth";
-	@Autowired
-	private JWTSettings jwtSettings;
 
 	public JWTToken createToken(Authentication authentication, boolean rememberMe) {
 		String authorities = authentication.getAuthorities().stream()
 			.map(GrantedAuthority::getAuthority)
 			.collect(Collectors.joining(","));
 		DateTime currentTime = new DateTime();
-		Integer expirationTime = rememberMe ? jwtSettings.getTokenExpirationTimeWithRememberMe() : jwtSettings.getTokenExpirationTime();
+		Integer expirationTime = rememberMe ? JWTAccountConstant.TOKEN_EXP_TIME_WITH_REMEMBER : JWTAccountConstant.TOKEN_EXP_TIME;
 		String token = Jwts.builder()
 				.setSubject(authentication.getName())
 				.claim(AUTHORITIES_KEY, authorities)
-				.setIssuer(jwtSettings.getTokenIssuer())
+				.setIssuer(JWTAccountConstant.TOKEN_ISSUER)
 				.setIssuedAt(currentTime.toDate())
 			.setExpiration(currentTime.plusMinutes(expirationTime).toDate())
-				.signWith(SignatureAlgorithm.HS512, jwtSettings.getTokenSigningKey())
+				.signWith(SignatureAlgorithm.HS512, JWTAccountConstant.TOKEN_SIGNING_KEY)
 			.compact();
 		return new JWTToken(token);
 	}
 
 	public Authentication getAuthentication(String token) {
 		Claims claims = Jwts.parser()
-			.setSigningKey(jwtSettings.getTokenSigningKey())
+			.setSigningKey(JWTAccountConstant.TOKEN_SIGNING_KEY)
 			.parseClaimsJws(token)
 			.getBody();
 
@@ -61,7 +59,7 @@ public class TokenProvider implements Serializable{
 
 	public boolean validateToken(String authToken) {
 		try {
-			Jwts.parser().setSigningKey(jwtSettings.getTokenSigningKey()).parseClaimsJws(authToken);
+			Jwts.parser().setSigningKey(JWTAccountConstant.TOKEN_SIGNING_KEY).parseClaimsJws(authToken);
 			return true;
 		} catch (SignatureException e) {
 			log.info("Invalid JWT signature.");

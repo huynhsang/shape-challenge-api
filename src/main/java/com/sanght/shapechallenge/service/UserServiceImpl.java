@@ -29,8 +29,7 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    final
-    MessageSource messageSource;
+    private final MessageSource messageSource;
 
     public UserServiceImpl(RoleDAO roleDAO, UserDAO userDAO, PasswordEncoder passwordEncoder, MessageSource messageSource) {
         this.roleDAO = roleDAO;
@@ -66,18 +65,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long id) throws NotFoundException {
-        return null;
+    public User getUserById(Integer id) throws NotFoundException {
+        Optional<User> user = userDAO.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        }
+        String errMsg = messageSource.getMessage("err.user.notExists", null, LocaleContextHolder.getLocale());
+        throw new NotFoundException(errMsg);
     }
 
     @Override
     public User getUserByUsername(String username) throws NotFoundException {
-        return null;
+        Optional<User> user = userDAO.findOneByUsername(username);
+        if (user.isPresent()) {
+            return user.get();
+        }
+        String errMsg = messageSource.getMessage("err.user.notExists", null, LocaleContextHolder.getLocale());
+        throw new NotFoundException(errMsg);
     }
 
     @Override
-    public void delete(Long id) {
-
+    public void delete(Integer id) {
+        userDAO.deleteById(id);
+        log.debug("Deleted User by id: {}", id);
     }
 
     private boolean isUsernameExists(String username) throws ValidationException {

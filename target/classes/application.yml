@@ -1,11 +1,3 @@
-variable.security.jwt:
-  tokenIssuer: sanghuynh
-  tokenSigningKey: shape-challenge
-  #  Token is valid for 1 day = 1440 mins
-  tokenExpirationTime: 1440
-  #  Token is valid for 1 week = 10080 mins
-  tokenExpirationTimeWithRememberMe: 10080
-
 spring:
   application:
     name: ShapeChallenge

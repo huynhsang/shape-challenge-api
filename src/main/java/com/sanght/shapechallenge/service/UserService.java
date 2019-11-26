@@ -15,7 +15,7 @@ public interface UserService {
      *  @param id the user id
      *  @return the entity
      */
-    User getUserById(Long id) throws NotFoundException;
+    User getUserById(Integer id) throws NotFoundException;
 
     /**
      *  Get the user by username.
@@ -30,5 +30,5 @@ public interface UserService {
      *
      *  @param id the id of the entity
      */
-    void delete(Long id);
+    void delete(Integer id);
 }

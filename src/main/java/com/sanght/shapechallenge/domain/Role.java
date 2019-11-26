@@ -17,7 +17,7 @@ public class Role implements Serializable {
     @NotNull
     private String name;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "role_mapping",
         joinColumns = @JoinColumn(name = "role_id"),

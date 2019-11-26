@@ -1,6 +1,8 @@
 package com.sanght.shapechallenge.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sanght.shapechallenge.common.constant.ValidationConstant;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -18,18 +20,20 @@ public class User implements Serializable {
     private Integer id;
 
     @NotNull
-    @Size(min = 4, max = 100)
+    @Size(min = ValidationConstant.USERNAME_MIN_LENGTH, max = ValidationConstant.USERNAME_MAX_LENGTH)
     private String username;
 
     @NotNull
-    @Size(min = 4, max = 100)
+    @Size(min = ValidationConstant.PASSWORD_MIN_LENGTH, max = ValidationConstant.PASSWORD_MAX_LENGTH)
+    @JsonIgnore
     private String password;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "role_mapping",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JsonIgnore
     Set<Role> roles;
 
     public Integer getId() {

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface UserDAO extends JpaRepository<User, Integer> {
     Optional<User> findOneByUsername(String username);
+    void deleteById(Integer id);
 }
