@@ -22,7 +22,7 @@ public class Condition implements Serializable {
     private String comparator;
 
     @NotNull
-    private String operand;
+    private String operands;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -53,12 +53,12 @@ public class Condition implements Serializable {
         this.comparator = comparator;
     }
 
-    public String getOperand() {
-        return operand;
+    public String getOperands() {
+        return operands;
     }
 
-    public void setOperand(String operand) {
-        this.operand = operand;
+    public void setOperands(String operands) {
+        this.operands = operands;
     }
 
     public Category getCategory() {

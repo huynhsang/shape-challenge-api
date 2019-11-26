@@ -23,6 +23,9 @@ public class Category implements Serializable {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Condition> conditions;
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Formula> formulas;
+
     public Integer getId() {
         return id;
     }
@@ -37,6 +40,30 @@ public class Category implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Requirement> getRequirements() {
+        return requirements;
+    }
+
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
+    }
+
+    public List<Condition> getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(List<Condition> conditions) {
+        this.conditions = conditions;
+    }
+
+    public List<Formula> getFormulas() {
+        return formulas;
+    }
+
+    public void setFormulas(List<Formula> formulas) {
+        this.formulas = formulas;
     }
 
     @Override

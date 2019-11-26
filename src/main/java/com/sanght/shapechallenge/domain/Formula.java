@@ -1,5 +1,6 @@
 package com.sanght.shapechallenge.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
@@ -17,6 +18,12 @@ public class Formula implements Serializable {
 
     @NotNull
     private String name;
+
+    @NotNull
+    private String function;
+
+    @NotNull
+    private String arguments;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -47,11 +54,29 @@ public class Formula implements Serializable {
         this.category = category;
     }
 
+    public String getFunction() {
+        return function;
+    }
+
+    public void setFunction(String function) {
+        this.function = function;
+    }
+
+    public String getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(String arguments) {
+        this.arguments = arguments;
+    }
+
     @Override
     public String toString() {
         return "Formula{" +
                 ", id='"+ id +"'"+
                 ", name='"+ name +"'"+
+                ", function='"+ function +"'"+
+                ", arguments='"+ arguments +"'"+
                 '}';
     }
 }

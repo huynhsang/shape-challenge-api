@@ -1,44 +1,27 @@
-package com.sanght.shapechallenge.domain;
+package com.sanght.shapechallenge.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sanght.shapechallenge.domain.Category;
+import com.sanght.shapechallenge.domain.Requirement;
+import com.sanght.shapechallenge.domain.User;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
-@Entity
-@Table(name = "shape", schema="public")
-public class Shape implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ShapeDTO {
     private Integer id;
 
-    @NotNull
     private String name;
 
-    @NotNull
     private double area;
 
-    @Column(name = "possible_categories")
-    private String possibleCategories;
+    private Map<String, Double> dimensions;
 
-    private String dimensions;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Category category;
 
-    @ManyToOne
-    @JoinColumn(name = "requirement_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Requirement requirement;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Category> possibleCategories;
+
     private User user;
 
     public Integer getId() {
@@ -65,19 +48,11 @@ public class Shape implements Serializable {
         this.area = area;
     }
 
-    public String getPossibleCategories() {
-        return possibleCategories;
-    }
-
-    public void setPossibleCategories(String possibleCategories) {
-        this.possibleCategories = possibleCategories;
-    }
-
-    public String getDimensions() {
+    public Map<String, Double> getDimensions() {
         return dimensions;
     }
 
-    public void setDimensions(String dimensions) {
+    public void setDimensions(Map<String, Double> dimensions) {
         this.dimensions = dimensions;
     }
 
@@ -97,6 +72,14 @@ public class Shape implements Serializable {
         this.requirement = requirement;
     }
 
+    public List<Category> getPossibleCategories() {
+        return possibleCategories;
+    }
+
+    public void setPossibleCategories(List<Category> possibleCategories) {
+        this.possibleCategories = possibleCategories;
+    }
+
     public User getUser() {
         return user;
     }
@@ -107,7 +90,7 @@ public class Shape implements Serializable {
 
     @Override
     public String toString() {
-        return "Shape{" +
+        return "ShapeDTO{" +
                 ", id='"+ id +"'"+
                 ", name='"+ name +"'"+
                 ", area='"+ area +"'"+

@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Component
-public class TokenProvider implements Serializable{
+public class TokenProvider implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private final Logger log = LoggerFactory.getLogger(TokenProvider.class);

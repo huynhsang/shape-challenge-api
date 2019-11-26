@@ -2,6 +2,7 @@ package com.sanght.shapechallenge.service;
 
 import com.sanght.shapechallenge.common.exception.NotFoundException;
 import com.sanght.shapechallenge.common.exception.ValidationException;
+import com.sanght.shapechallenge.common.util.SecurityUtil;
 import com.sanght.shapechallenge.domain.Role;
 import com.sanght.shapechallenge.domain.User;
 import com.sanght.shapechallenge.repository.RoleDAO;
@@ -61,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getCurrentUser() throws NotFoundException {
-        return null;
+        return getUserByUsername(SecurityUtil.getCurrentUsername());
     }
 
     @Override
