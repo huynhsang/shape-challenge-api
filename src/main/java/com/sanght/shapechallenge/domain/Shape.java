@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "shape", schema="public")
@@ -21,15 +22,10 @@ public class Shape implements Serializable {
     @NotNull
     private double area;
 
-    @Column(name = "possible_categories")
-    private String possibleCategories;
-
     private String dimensions;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Category category;
+    @OneToMany(mappedBy = "shape")
+    List<ShapeCategory> shapeCategories;
 
     @ManyToOne
     @JoinColumn(name = "requirement_id")
@@ -65,28 +61,12 @@ public class Shape implements Serializable {
         this.area = area;
     }
 
-    public String getPossibleCategories() {
-        return possibleCategories;
-    }
-
-    public void setPossibleCategories(String possibleCategories) {
-        this.possibleCategories = possibleCategories;
-    }
-
     public String getDimensions() {
         return dimensions;
     }
 
     public void setDimensions(String dimensions) {
         this.dimensions = dimensions;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
     }
 
     public Requirement getRequirement() {
@@ -103,6 +83,14 @@ public class Shape implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<ShapeCategory> getShapeCategories() {
+        return shapeCategories;
+    }
+
+    public void setShapeCategories(List<ShapeCategory> shapeCategories) {
+        this.shapeCategories = shapeCategories;
     }
 
     @Override

@@ -1,16 +1,14 @@
-package com.sanght.shapechallenge.service.mapper;
+package com.sanght.shapechallenge.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanght.shapechallenge.common.exception.ValidationException;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
-public class RequirementMapper {
-    public Map<String, Boolean> parseSet(String set) throws ValidationException {
+public class RequirementUtil {
+    public static Map<String, Boolean> parseSet(String set) throws ValidationException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Boolean> output = new HashMap<>();
         try {

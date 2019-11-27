@@ -36,7 +36,7 @@ public class CategoryController {
      */
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories(@ApiParam Pageable pageable) {
-        log.debug("REST request to get a page of Violations");
+        log.debug("REST request to get a page of Categories");
         Page<Category> page = categoryService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/categories");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

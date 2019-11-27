@@ -1,23 +1,26 @@
 package com.sanght.shapechallenge.service;
 
+import com.sanght.shapechallenge.common.constant.RoleName;
 import com.sanght.shapechallenge.common.exception.NotFoundException;
+import com.sanght.shapechallenge.common.exception.PermissionDeniedException;
 import com.sanght.shapechallenge.common.exception.ValidationException;
-import com.sanght.shapechallenge.domain.Category;
-import com.sanght.shapechallenge.domain.Requirement;
-import com.sanght.shapechallenge.domain.Shape;
-import com.sanght.shapechallenge.domain.User;
+import com.sanght.shapechallenge.common.util.RequirementUtil;
+import com.sanght.shapechallenge.common.util.SecurityUtil;
+import com.sanght.shapechallenge.common.util.ShapeUtil;
+import com.sanght.shapechallenge.domain.*;
 import com.sanght.shapechallenge.provider.ShapeProvider;
 import com.sanght.shapechallenge.repository.ShapeDAO;
-import com.sanght.shapechallenge.service.dto.ShapeDTO;
-import com.sanght.shapechallenge.service.mapper.RequirementMapper;
-import com.sanght.shapechallenge.service.mapper.ShapeMapper;
-import com.sanght.shapechallenge.web.vmodel.ShapeVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -30,49 +33,72 @@ public class ShapeServiceImpl implements ShapeService {
 
     private final RequirementService requirementService;
 
-    private final RequirementMapper requirementMapper;
-
-    private final ShapeMapper shapeMapper;
-
     private final MessageSource messageSource;
 
     private final UserService userService;
 
-    public ShapeServiceImpl(ShapeDAO shapeDAO, ShapeProvider shapeProvider, RequirementService requirementService, RequirementMapper requirementMapper, ShapeMapper shapeMapper, MessageSource messageSource, UserService userService) {
+    public ShapeServiceImpl(ShapeDAO shapeDAO, ShapeProvider shapeProvider, RequirementService requirementService, MessageSource messageSource, UserService userService) {
         this.shapeDAO = shapeDAO;
         this.shapeProvider = shapeProvider;
         this.requirementService = requirementService;
-        this.requirementMapper = requirementMapper;
-        this.shapeMapper = shapeMapper;
         this.messageSource = messageSource;
         this.userService = userService;
     }
 
     @Override
-    public ShapeDTO submit(ShapeVM shapeVM) throws NotFoundException, ValidationException {
-        Requirement requirement = requirementService.findOneById(shapeVM.getRequirementId());
-        Map<String, Double> dimensions = shapeMapper.parseDimensions(shapeVM.getDimensions());
-        Map<String, Boolean> requirementSets = requirementMapper.parseSet(requirement.getSet());
+    public Shape submit(Shape shape) throws NotFoundException, ValidationException {
+        User user = userService.getCurrentUser();
+        Requirement requirement = requirementService.findOneById(shape.getRequirement().getId());
+        Map<String, Double> dimensions = ShapeUtil.parseDimensions(shape.getDimensions());
+        Map<String, Boolean> requirementSets = RequirementUtil.parseSet(requirement.getSet());
         verifyDimensions(dimensions, requirementSets);
+
+        List<ShapeCategory> shapeCategories = new ArrayList<>();
         Category category = requirement.getCategory();
-        ShapeDTO shape = new ShapeDTO();
-        shape.setName(shapeVM.getName());
-        shape.setDimensions(dimensions);
-        shape.setCategory(category);
+        shapeCategories.add(new ShapeCategory(shape, category, true));
+        List<Category> possibleCategories = shapeProvider.getPossibleCategories(category.getConditions(), dimensions);
+        possibleCategories.forEach(c -> shapeCategories.add(new ShapeCategory(shape, c, false)));
+        shape.setShapeCategories(shapeCategories);
         shape.setRequirement(requirement);
         shape.setArea(shapeProvider.calculateArea(category.getFormulas(), dimensions));
-        shape.setPossibleCategories(shapeProvider.getPossibleCategories(category.getConditions(), dimensions));
+        shape.setUser(user);
         return shape;
     }
 
     @Override
-    public Shape save(ShapeVM shapeVM) throws NotFoundException, ValidationException {
+    public Shape save(Shape shape) throws NotFoundException, ValidationException {
+        shape = shapeDAO.save(submit(shape));
+        log.debug("Saved shape: {}", shape);
+        return shape;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Shape> findAll(Pageable pageable) throws NotFoundException {
+        if (SecurityUtil.isCurrentUserInRole(RoleName.ROLE_ADMIN.name())) {
+            return shapeDAO.findAll(pageable);
+        }
         User user = userService.getCurrentUser();
-        ShapeDTO shapeDTO = submit(shapeVM);
-        Shape shape = shapeMapper.convertDTOToEntity(shapeDTO);
+        return shapeDAO.findAllByUserId(user.getId(), pageable);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        shapeDAO.deleteById(id);
+    }
+
+    @Override
+    public Shape createShape(Shape shape, Integer userId) throws NotFoundException, ValidationException, PermissionDeniedException {
+        if (!SecurityUtil.isCurrentUserInRole(RoleName.ROLE_ADMIN.name())) {
+            String errorMsg = messageSource.getMessage("err.notAllow", null, LocaleContextHolder.getLocale());
+            throw new PermissionDeniedException(errorMsg);
+        }
+        User admin = userService.getCurrentUser();
+        User user = userService.getUserById(userId);
+        shape = submit(shape);
         shape.setUser(user);
         shape = shapeDAO.save(shape);
-        log.debug("Saved shape: {}", shape);
+        log.debug("Created shape: {}", shape);
         return shape;
     }
 
