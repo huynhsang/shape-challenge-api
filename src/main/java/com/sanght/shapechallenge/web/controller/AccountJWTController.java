@@ -1,9 +1,9 @@
 package com.sanght.shapechallenge.web.controller;
 
 import com.sanght.shapechallenge.common.constant.JWTAccountConstant;
-import com.sanght.shapechallenge.common.constant.RoleName;
 import com.sanght.shapechallenge.common.exception.ValidationException;
 import com.sanght.shapechallenge.domain.AccessToken;
+import com.sanght.shapechallenge.security.jwt.AuthorityConstant;
 import com.sanght.shapechallenge.service.AccessTokenService;
 import com.sanght.shapechallenge.service.UserService;
 import com.sanght.shapechallenge.web.vmodel.AccountVM;
@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,7 +60,26 @@ public class AccountJWTController {
 		HttpHeaders textPlainHeaders = new HttpHeaders();
 		textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);
 		try {
-			userService.createUser(accountVM.getUsername().toLowerCase(), accountVM.getPassword(), RoleName.ROLE_USER.name());
+			userService.createUser(accountVM.getUsername().toLowerCase(), accountVM.getPassword(), AuthorityConstant.ROLE_USER);
+		} catch (ValidationException e) {
+			return new ResponseEntity<>(e.getMessage(), textPlainHeaders, HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	/**
+	 * POST  /admin : create admin account.
+	 *
+	 * @param accountVM the account view model
+	 * @return the ResponseEntity with status 201 (Created) if the user is registered or 400 (Bad Request) if the username or email is already in use
+	 */
+	@PostMapping(path = "/admin", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+	@Secured(AuthorityConstant.ROLE_ADMIN)
+	public ResponseEntity<?> createAdmin(@Valid @RequestBody AccountVM accountVM) {
+		HttpHeaders textPlainHeaders = new HttpHeaders();
+		textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);
+		try {
+			userService.createUser(accountVM.getUsername().toLowerCase(), accountVM.getPassword(), AuthorityConstant.ROLE_ADMIN);
 		} catch (ValidationException e) {
 			return new ResponseEntity<>(e.getMessage(), textPlainHeaders, HttpStatus.BAD_REQUEST);
 		}

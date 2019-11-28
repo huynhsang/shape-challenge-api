@@ -1,7 +1,6 @@
 package com.sanght.shapechallenge.web.controller;
 
 import com.sanght.shapechallenge.common.exception.NotFoundException;
-import com.sanght.shapechallenge.common.exception.PermissionDeniedException;
 import com.sanght.shapechallenge.common.exception.ValidationException;
 import com.sanght.shapechallenge.common.util.HeaderUtil;
 import com.sanght.shapechallenge.common.util.PaginationUtil;
@@ -93,21 +92,20 @@ public class ShapeController {
         }
     }
 
-    @PostMapping(path = "/shape/{id}", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    public ResponseEntity<?> create(@PathVariable Integer id, @Valid @RequestBody Shape shape) {
-        log.debug("Request to create the shape {} for user id {}", shape, id);
-        HttpHeaders textPlainHeaders = new HttpHeaders();
-        textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);
+    @GetMapping("/shape/{id}")
+    public ResponseEntity<Shape> getAllShapes(@PathVariable Integer id) {
+        log.debug("REST request to get a shape by Id {}", id);
         try {
-            shape = shapeService.createShape(shape, id);
-            return ResponseUtil.createdOrNot(Optional.ofNullable(shape));
-        } catch (ValidationException | NotFoundException | PermissionDeniedException e) {
-            return new ResponseEntity<>(e.getMessage(), textPlainHeaders, HttpStatus.BAD_REQUEST);
+            Shape shape = shapeService.findById(id);
+            return ResponseUtil.wrapOrNotFound(Optional.ofNullable(shape));
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseUtil.wrapOrNotFound(Optional.empty());
         }
     }
 
     @DeleteMapping("/shape/{id}")
-    public ResponseEntity<Void> deleteViolation(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         log.debug("REST request to delete Shape : {}", id);
         shapeService.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

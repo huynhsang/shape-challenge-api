@@ -1,13 +1,13 @@
 package com.sanght.shapechallenge.service;
 
 import com.sanght.shapechallenge.common.constant.JWTAccountConstant;
-import com.sanght.shapechallenge.common.constant.RoleName;
 import com.sanght.shapechallenge.common.exception.NotFoundException;
 import com.sanght.shapechallenge.common.exception.PermissionDeniedException;
 import com.sanght.shapechallenge.domain.AccessToken;
 import com.sanght.shapechallenge.domain.Role;
 import com.sanght.shapechallenge.domain.User;
 import com.sanght.shapechallenge.repository.AccessTokenDAO;
+import com.sanght.shapechallenge.security.jwt.AuthorityConstant;
 import com.sanght.shapechallenge.security.jwt.JWTToken;
 import com.sanght.shapechallenge.security.jwt.TokenProvider;
 import com.sanght.shapechallenge.web.vmodel.LoginVM;
@@ -83,7 +83,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     private boolean isAdmin(User user) {
         Optional<Role> adminRole = user.getRoles()
                 .stream()
-                .filter(role -> role.getName().equals(RoleName.ROLE_ADMIN.name()))
+                .filter(role -> role.getName().equals(AuthorityConstant.ROLE_ADMIN))
                 .findFirst();
         return adminRole.isPresent();
     }

@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ConditionUtil {
     public static Category matchCategory(Condition condition, Map<String, Double> dimensions) {
-        JSONArray operands = new JSONArray(condition.getOperands());
+        JSONArray operands = new JSONArray(condition.getOperandJSON());
         for (int i = 0, length = operands.length(); i < length - 1; i++) {
             try {
                 String operandA = operands.getString(i);

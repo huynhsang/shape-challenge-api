@@ -1,6 +1,6 @@
 package com.sanght.shapechallenge.common.util;
 
-import com.sanght.shapechallenge.common.constant.RoleName;
+import com.sanght.shapechallenge.security.jwt.AuthorityConstant;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +40,7 @@ public final class SecurityUtil {
         Authentication authentication = securityContext.getAuthentication();
         if (authentication != null) {
             return authentication.getAuthorities().stream()
-                .noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(RoleName.ROLE_USER.name()));
+                .noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(AuthorityConstant.ROLE_USER));
         }
         return false;
     }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Map;
 
 @Entity
 @Table(name = "condition", schema="public")
@@ -22,7 +23,8 @@ public class Condition implements Serializable {
     private String comparator;
 
     @NotNull
-    private String operands;
+    @Column(name = "operands")
+    private String operandJSON;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -53,20 +55,20 @@ public class Condition implements Serializable {
         this.comparator = comparator;
     }
 
-    public String getOperands() {
-        return operands;
-    }
-
-    public void setOperands(String operands) {
-        this.operands = operands;
-    }
-
     public Category getCategory() {
         return category;
     }
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public String getOperandJSON() {
+        return operandJSON;
+    }
+
+    public void setOperandJSON(String operandJSON) {
+        this.operandJSON = operandJSON;
     }
 
     @Override

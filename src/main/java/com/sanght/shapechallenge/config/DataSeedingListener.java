@@ -1,7 +1,7 @@
 package com.sanght.shapechallenge.config;
 
-import com.sanght.shapechallenge.common.constant.RoleName;
 import com.sanght.shapechallenge.common.exception.ValidationException;
+import com.sanght.shapechallenge.security.jwt.AuthorityConstant;
 import com.sanght.shapechallenge.service.RoleService;
 import com.sanght.shapechallenge.service.UserService;
 import org.slf4j.Logger;
@@ -46,12 +46,12 @@ public class DataSeedingListener implements ApplicationListener<ContextRefreshed
     }
 
     private void initRoles() throws ValidationException {
-        for (RoleName name: RoleName.values()) {
-            roleService.findOrCreate(name.name());
+        for (String name: AuthorityConstant.ROLE_NAMES) {
+            roleService.findOrCreate(name);
         }
     }
 
     private void initAdmin() throws ValidationException {
-        userService.createUser("admin", "admin", RoleName.ROLE_ADMIN.name());
+        userService.createUser("admin", "admin", AuthorityConstant.ROLE_ADMIN);
     }
 }

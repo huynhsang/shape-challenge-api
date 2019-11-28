@@ -1,15 +1,16 @@
 package com.sanght.shapechallenge.service;
 
-import com.sanght.shapechallenge.common.constant.RoleName;
 import com.sanght.shapechallenge.common.exception.ValidationException;
 import com.sanght.shapechallenge.domain.Role;
 import com.sanght.shapechallenge.repository.RoleDAO;
+import com.sanght.shapechallenge.security.jwt.AuthorityConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -28,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role findOrCreate(String roleName) throws ValidationException {
-        if (!RoleName.contains(roleName)) {
+        if (Arrays.stream(AuthorityConstant.ROLE_NAMES).noneMatch(roleName::equals)) {
             String errMsg = messageSource.getMessage("err.role.name.notExists", null, LocaleContextHolder.getLocale());
             throw new ValidationException(errMsg);
         }

@@ -16,5 +16,5 @@ public interface ShapeService {
 
     void deleteById(Integer id);
 
-    Shape createShape(Shape shape, Integer userId) throws NotFoundException, ValidationException, PermissionDeniedException;
+    Shape findById(Integer id) throws NotFoundException;
 }

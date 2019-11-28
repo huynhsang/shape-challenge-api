@@ -1,8 +1,6 @@
 package com.sanght.shapechallenge.service;
 
-import com.sanght.shapechallenge.common.constant.RoleName;
 import com.sanght.shapechallenge.common.exception.NotFoundException;
-import com.sanght.shapechallenge.common.exception.PermissionDeniedException;
 import com.sanght.shapechallenge.common.exception.ValidationException;
 import com.sanght.shapechallenge.common.util.RequirementUtil;
 import com.sanght.shapechallenge.common.util.SecurityUtil;
@@ -10,6 +8,7 @@ import com.sanght.shapechallenge.common.util.ShapeUtil;
 import com.sanght.shapechallenge.domain.*;
 import com.sanght.shapechallenge.provider.ShapeProvider;
 import com.sanght.shapechallenge.repository.ShapeDAO;
+import com.sanght.shapechallenge.security.jwt.AuthorityConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ShapeServiceImpl implements ShapeService {
@@ -47,7 +47,6 @@ public class ShapeServiceImpl implements ShapeService {
 
     @Override
     public Shape submit(Shape shape) throws NotFoundException, ValidationException {
-        User user = userService.getCurrentUser();
         Requirement requirement = requirementService.findOneById(shape.getRequirement().getId());
         Map<String, Double> dimensions = ShapeUtil.parseDimensions(shape.getDimensions());
         Map<String, Boolean> requirementSets = RequirementUtil.parseSet(requirement.getSet());
@@ -61,12 +60,15 @@ public class ShapeServiceImpl implements ShapeService {
         shape.setShapeCategories(shapeCategories);
         shape.setRequirement(requirement);
         shape.setArea(shapeProvider.calculateArea(category.getFormulas(), dimensions));
-        shape.setUser(user);
         return shape;
     }
 
     @Override
     public Shape save(Shape shape) throws NotFoundException, ValidationException {
+        shape = submit(shape);
+        if (shape.getUser() == null || !SecurityUtil.isCurrentUserInRole(AuthorityConstant.ROLE_ADMIN)) {
+            shape.setUser(userService.getCurrentUser());
+        }
         shape = shapeDAO.save(submit(shape));
         log.debug("Saved shape: {}", shape);
         return shape;
@@ -75,7 +77,7 @@ public class ShapeServiceImpl implements ShapeService {
     @Override
     @Transactional(readOnly = true)
     public Page<Shape> findAll(Pageable pageable) throws NotFoundException {
-        if (SecurityUtil.isCurrentUserInRole(RoleName.ROLE_ADMIN.name())) {
+        if (SecurityUtil.isCurrentUserInRole(AuthorityConstant.ROLE_ADMIN)) {
             return shapeDAO.findAll(pageable);
         }
         User user = userService.getCurrentUser();
@@ -85,22 +87,19 @@ public class ShapeServiceImpl implements ShapeService {
     @Override
     public void deleteById(Integer id) {
         shapeDAO.deleteById(id);
+        log.debug("Deleted shape by id {}", id);
     }
 
     @Override
-    public Shape createShape(Shape shape, Integer userId) throws NotFoundException, ValidationException, PermissionDeniedException {
-        if (!SecurityUtil.isCurrentUserInRole(RoleName.ROLE_ADMIN.name())) {
-            String errorMsg = messageSource.getMessage("err.notAllow", null, LocaleContextHolder.getLocale());
-            throw new PermissionDeniedException(errorMsg);
+    public Shape findById(Integer id) throws NotFoundException {
+        Optional<Shape> shape = shapeDAO.findById(id);
+        if (shape.isPresent()) {
+            return shape.get();
         }
-        User admin = userService.getCurrentUser();
-        User user = userService.getUserById(userId);
-        shape = submit(shape);
-        shape.setUser(user);
-        shape = shapeDAO.save(shape);
-        log.debug("Created shape: {}", shape);
-        return shape;
+        String errMsg = messageSource.getMessage("err.shape.notExists", null, LocaleContextHolder.getLocale());
+        throw new NotFoundException(errMsg);
     }
+
 
     private void verifyDimensions(Map<String, Double> dimensions, Map<String, Boolean> requirementSets) throws ValidationException {
         for (Map.Entry<String, Boolean> entry : requirementSets.entrySet()) {
