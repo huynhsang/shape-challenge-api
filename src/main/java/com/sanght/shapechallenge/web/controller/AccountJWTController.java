@@ -85,17 +85,4 @@ public class AccountJWTController {
 		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-
-	@PostMapping(path = "/adminLogin", produces={MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> adminLogin(@Valid @RequestBody LoginVM loginVM, HttpServletResponse response) {
-		try {
-			AccessToken accessToken =  accessTokenService.createAdminToken(loginVM);
-			response.addHeader(JWTAccountConstant.AUTHORIZATION_HEADER, "Bearer " + accessToken.getId());
-			return ResponseEntity.ok(accessToken);
-		} catch (Exception e) {
-			log.error("Authentication exception trace: {}", e);
-			return new ResponseEntity<>(Collections.singletonMap("AuthenticationException",
-					e.getLocalizedMessage()), HttpStatus.UNAUTHORIZED);
-		}
-	}
 }

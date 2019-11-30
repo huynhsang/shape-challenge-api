@@ -8,6 +8,4 @@ import org.springframework.security.core.AuthenticationException;
 
 public interface AccessTokenService {
     AccessToken createToken(LoginVM loginVM) throws AuthenticationException, NotFoundException;
-
-    AccessToken createAdminToken(LoginVM loginVM) throws AuthenticationException, NotFoundException, PermissionDeniedException;
 }

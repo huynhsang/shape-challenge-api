@@ -48,7 +48,7 @@ public class ShapeServiceImpl implements ShapeService {
     @Override
     public Shape submit(Shape shape) throws NotFoundException, ValidationException {
         Requirement requirement = requirementService.findOneById(shape.getRequirement().getId());
-        Map<String, Double> dimensions = ShapeUtil.parseDimensions(shape.getDimensions());
+        Map<String, Double> dimensions = ShapeUtil.parseDimensions(shape.getDimensionJSON());
         Map<String, Boolean> requirementSets = RequirementUtil.parseSet(requirement.getSet());
         verifyDimensions(dimensions, requirementSets);
 

@@ -52,16 +52,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         return createAccessToken(user, loginVM);
     }
 
-    @Override
-    public AccessToken createAdminToken(LoginVM loginVM) throws AuthenticationException, NotFoundException, PermissionDeniedException {
-        User user = userService.getUserByUsername(loginVM.getUsername());
-        if (isAdmin(user)) {
-            return createAccessToken(user, loginVM);
-        }
-        String errorMsg = messageSource.getMessage("err.notAllow", null, LocaleContextHolder.getLocale());
-        throw new PermissionDeniedException(errorMsg);
-    }
-
     private AccessToken createAccessToken(User user, LoginVM loginVM) throws AuthenticationException, NotFoundException {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());

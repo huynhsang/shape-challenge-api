@@ -1,5 +1,7 @@
 package com.sanght.shapechallenge.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -22,6 +24,7 @@ public class Role implements Serializable {
         name = "role_mapping",
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonIgnore
     Set<User> users;
 
     public Integer getId() {

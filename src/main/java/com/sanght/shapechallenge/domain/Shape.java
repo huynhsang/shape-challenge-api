@@ -22,7 +22,8 @@ public class Shape implements Serializable {
     @NotNull
     private double area;
 
-    private String dimensions;
+    @Column(name = "dimensions")
+    private String dimensionJSON;
 
     @OneToMany(mappedBy = "shape")
     List<ShapeCategory> shapeCategories;
@@ -61,12 +62,12 @@ public class Shape implements Serializable {
         this.area = area;
     }
 
-    public String getDimensions() {
-        return dimensions;
+    public String getDimensionJSON() {
+        return dimensionJSON;
     }
 
-    public void setDimensions(String dimensions) {
-        this.dimensions = dimensions;
+    public void setDimensionJSON(String dimensionJSON) {
+        this.dimensionJSON = dimensionJSON;
     }
 
     public Requirement getRequirement() {
@@ -99,7 +100,7 @@ public class Shape implements Serializable {
                 ", id='"+ id +"'"+
                 ", name='"+ name +"'"+
                 ", area='"+ area +"'"+
-                ", dimensions='"+ dimensions +"'"+
+                ", dimensionJSON='"+ dimensionJSON +"'"+
                 '}';
     }
 }

@@ -33,7 +33,6 @@ public class User implements Serializable {
         name = "role_mapping",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @JsonIgnore
     Set<Role> roles;
 
     public Integer getId() {
