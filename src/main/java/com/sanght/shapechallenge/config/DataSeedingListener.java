@@ -22,9 +22,12 @@ public class DataSeedingListener implements ApplicationListener<ContextRefreshed
 
     private final RoleService roleService;
 
-    public DataSeedingListener(UserService userService, RoleService roleService) {
+    private final RoleService categoryService;
+
+    public DataSeedingListener(UserService userService, RoleService roleService, RoleService categoryService) {
         this.userService = userService;
         this.roleService = roleService;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -53,5 +56,9 @@ public class DataSeedingListener implements ApplicationListener<ContextRefreshed
 
     private void initAdmin() throws ValidationException {
         userService.createUser("admin", "admin", AuthorityConstant.ROLE_ADMIN);
+    }
+
+    private void initCategories() {
+
     }
 }

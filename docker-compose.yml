@@ -5,7 +5,7 @@ services:
         container_name: shape_mysql
         ports:
             - "3306:3306"
-        restart: always
+        # restart: always
         volumes:
             - ./dbStructure.sql:/docker-entrypoint-initdb.d/dbStructure.sql
         environment:

@@ -1,8 +1,11 @@
 package com.sanght.shapechallenge.web.controller;
 
 import com.sanght.shapechallenge.common.constant.JWTAccountConstant;
+import com.sanght.shapechallenge.common.exception.NotFoundException;
 import com.sanght.shapechallenge.common.exception.ValidationException;
+import com.sanght.shapechallenge.common.util.ResponseUtil;
 import com.sanght.shapechallenge.domain.AccessToken;
+import com.sanght.shapechallenge.domain.User;
 import com.sanght.shapechallenge.security.jwt.AuthorityConstant;
 import com.sanght.shapechallenge.service.AccessTokenService;
 import com.sanght.shapechallenge.service.UserService;
@@ -15,13 +18,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Collections;
+import java.util.Optional;
 
 @RestController
 public class AccountJWTController {
@@ -67,22 +69,27 @@ public class AccountJWTController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	/**
-	 * POST  /admin : create admin account.
-	 *
-	 * @param accountVM the account view model
-	 * @return the ResponseEntity with status 201 (Created) if the user is registered or 400 (Bad Request) if the username or email is already in use
-	 */
-	@PostMapping(path = "/admin", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-	@Secured(AuthorityConstant.ROLE_ADMIN)
-	public ResponseEntity<?> createAdmin(@Valid @RequestBody AccountVM accountVM) {
-		HttpHeaders textPlainHeaders = new HttpHeaders();
-		textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);
+	@GetMapping("/account")
+	public ResponseEntity<User> getAccount() {
+		log.debug("REST request to get current account");
 		try {
-			userService.createUser(accountVM.getUsername().toLowerCase(), accountVM.getPassword(), AuthorityConstant.ROLE_ADMIN);
-		} catch (ValidationException e) {
-			return new ResponseEntity<>(e.getMessage(), textPlainHeaders, HttpStatus.BAD_REQUEST);
+			User user = userService.getCurrentUser();
+			return ResponseUtil.wrapOrNotFound(Optional.ofNullable(user));
+		} catch (NotFoundException e) {
+			log.error(e.getMessage());
+			return ResponseUtil.wrapOrNotFound(Optional.empty());
 		}
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@GetMapping("/logout")
+	public ResponseEntity<?> logout() {
+		log.debug("REST request to logout account");
+		try {
+			User user = userService.getCurrentUser();
+			return ResponseUtil.wrapOrNotFound(Optional.ofNullable(user));
+		} catch (NotFoundException e) {
+			log.error(e.getMessage());
+			return ResponseUtil.wrapOrNotFound(Optional.empty());
+		}
 	}
 }

@@ -25,7 +25,8 @@ public class WebConfigurer {
 		config.setMaxAge(1800L);
         if (config.getAllowedOrigins() != null && !config.getAllowedOrigins().isEmpty()) {
             source.registerCorsConfiguration("/register", config);
-            source.registerCorsConfiguration("/authenticate", config);
+            source.registerCorsConfiguration("/login", config);
+            source.registerCorsConfiguration("/account", config);
 //            source.registerCorsConfiguration("/static/**", config);
             source.registerCorsConfiguration("/api/**", config);
             source.registerCorsConfiguration("/v2/api-docs", config);

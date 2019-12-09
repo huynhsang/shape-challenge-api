@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +85,12 @@ public class UserServiceImpl implements UserService {
         }
         String errMsg = messageSource.getMessage("err.user.notExists", null, LocaleContextHolder.getLocale());
         throw new NotFoundException(errMsg);
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        log.debug("Request to get all users");
+        return userDAO.findAll(pageable);
     }
 
     @Override
